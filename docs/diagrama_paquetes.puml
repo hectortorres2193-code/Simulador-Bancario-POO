@@ -1,0 +1,83 @@
+@startuml diagrama_paquetes
+title Diagrama de Paquetes - Simulador de Sistema Bancario y Créditos
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam backgroundColor white
+skinparam ArrowColor #333333
+skinparam PackageBorderColor #555555
+skinparam dpi 130
+skinparam nodesep 50
+skinparam ranksep 70
+
+package "Proyecto BancoApp (aplicación)" as APP #FFFBEA {
+  package "vista" as vista #FFFFFF {
+    note as nv
+      Main
+      VentanaPrincipal
+      VistaLogin
+      VistaDashboard
+      VistaCaja
+      VistaPrestamo
+      VistaGerente
+    end note
+  }
+  package "controlador" as controlador #FFFFFF {
+    note as nc
+      ControladorLogin
+      ControladorCuenta
+      ControladorPrestamo
+      ControladorGerente
+      ControladorPersistencia
+    end note
+  }
+  package "modelo" as modelo #FFFFFF {
+    note as nm
+      Usuario
+      Cuenta
+      Prestamo
+      Transaccion
+    end note
+  }
+  package "datos" as datos #FFFFFF {
+    note as nd
+      RepositorioDatos (interfaz)
+      RepositorioCSV
+      ContextoBanco (Singleton)
+    end note
+  }
+  package "util" as util #FFFFFF {
+    note as nu
+      Validacion
+    end note
+  }
+}
+
+package "Librería propia (.jar independiente)" as LIBP #E8F0FE {
+  package "motor.amortizacion" as motor #FFFFFF {
+    note as nl
+      CalculadoraAmortizacion
+      CuotaAmortizacion
+    end note
+  }
+}
+
+package "javax.swing / java.awt (Java SE)" as swing #EEEEEE
+folder "Archivos .csv\n(usuarios, cuentas,\nprestamos, transacciones)" as csv #FFFFFF
+
+vista ..> controlador : notifica eventos\n(ActionListener)
+vista ..> swing : usa
+vista ..> motor : solo muestra\nCuotaAmortizacion
+vista ..> modelo : muestra datos\n(Transaccion)
+controlador ..> modelo : manipula
+controlador ..> datos : ContextoBanco\ny repositorio
+controlador ..> util : valida
+controlador ..> motor : <<import>>\nconsume la librería
+datos ..> modelo : guarda y carga
+datos ..> csv : lee / escribe
+
+note bottom of LIBP
+  La librería no depende de ningún
+  otro paquete (ni swing, ni modelo).
+end note
+@enduml
