@@ -147,6 +147,7 @@ package "APLICACIÓN BANCARIA (BancoApp)" as APP #FFFBEA {
       + consultarDatos(): String
       + getNombre(): String
       + getRol(): String
+      + toCSV(): String
     }
     class Cuenta {
       - numeroCuenta: String
@@ -154,6 +155,7 @@ package "APLICACIÓN BANCARIA (BancoApp)" as APP #FFFBEA {
       + depositar(monto: double): double
       + retirar(monto: double): boolean
       + consultarSaldo(): double
+      + getNumeroCuenta(): String
     }
     class Prestamo {
       - monto: double
@@ -164,6 +166,7 @@ package "APLICACIÓN BANCARIA (BancoApp)" as APP #FFFBEA {
       + aprobarPrestamo(): void
       + realizarPago(monto: double): void
       + consultarDeuda(): double
+      + toCSV(): String
     }
     class Transaccion {
       - idTransaccion: int
@@ -173,21 +176,24 @@ package "APLICACIÓN BANCARIA (BancoApp)" as APP #FFFBEA {
       + registrar(): void
       + mostrarTransaccion(): String
       + obtenerTipo(): String
+      + toCSV(numeroCuenta: String): String
     }
   }
 
   package "datos (persistencia en .csv)" as DATOS {
     interface RepositorioDatos {
       + cargar(): void
-      + guardar(): void
+      + guardar(): boolean
     }
     class RepositorioCSV {
       - carpetaDatos: String
       + RepositorioCSV()
+      + RepositorioCSV(carpetaDatos: String)
       + cargar(): void
-      + guardar(): void
+      + guardar(): boolean
       - leerArchivo(nombre: String): List<String>
-      - escribirArchivo(nombre: String, lineas: List<String>): void
+      - escribirArchivo(nombre: String, lineas: List<String>): boolean
+      - avisoRenglon(archivo: String, renglon: int, motivo: String): void
     }
     class ContextoBanco <<Singleton>> {
       - {static} instancia: ContextoBanco
@@ -196,19 +202,31 @@ package "APLICACIÓN BANCARIA (BancoApp)" as APP #FFFBEA {
       - prestamos: List<Prestamo>
       - transacciones: List<Transaccion>
       - usuarioActual: Usuario
+      - mapaCuentasPorUsuario: Map<String, Cuenta>
+      - mapaPrestamosPorUsuario: Map<String, Prestamo>
+      - titularPorPrestamo: Map<Prestamo, String>
+      - cuentaPorTransaccion: Map<Transaccion, String>
       - ContextoBanco()
       + {static} getInstancia(): ContextoBanco
       + buscarUsuario(nombre: String): Usuario
-      + obtenerCuenta(usuario: Usuario): Cuenta
       + obtenerCliente(nombre: String): Usuario
+      + obtenerCuenta(usuario: Usuario): Cuenta
       + obtenerPrestamoCliente(usuario: Usuario): Prestamo
+      + agregarUsuario(usuario: Usuario): void
+      + asociarCuenta(nombreUsuario: String, cuenta: Cuenta): void
       + agregarPrestamo(prestamo: Prestamo): void
+      + asociarPrestamo(nombreUsuario: String, prestamo: Prestamo): void
       + agregarTransaccion(transaccion: Transaccion): void
+      + asociarTransaccion(numeroCuenta: String, transaccion: Transaccion): void
       + obtenerUsuarioActual(): Usuario
       + establecerUsuarioActual(usuario: Usuario): void
       + obtenerUsuarios(): List<Usuario>
-      + obtenerPrestamos(): List<Prestamo>
       + obtenerCuentas(): List<Cuenta>
+      + obtenerPrestamos(): List<Prestamo>
+      + obtenerTransacciones(): List<Transaccion>
+      + obtenerTitularDeCuenta(cuenta: Cuenta): String
+      + obtenerTitularDePrestamo(prestamo: Prestamo): String
+      + obtenerNumeroCuentaDeTransaccion(t: Transaccion): String
       + limpiar(): void
     }
   }

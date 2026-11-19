@@ -73,11 +73,11 @@ else datos válidos
 
   C -> REPO : guardar()
   activate REPO
-  REPO -> CTX : obtenerUsuarios() / obtenerCuentas() / obtenerPrestamos()
+  REPO -> CTX : obtenerUsuarios() / obtenerCuentas() / obtenerPrestamos() / obtenerTransacciones()
   CTX --> REPO : listas en memoria
   REPO -> CSV : escribirArchivo(usuarios, cuentas, prestamos, transacciones)
   CSV --> REPO : ok
-  REPO --> C : listo
+  REPO --> C : true (se guardaron los 4 archivos)
   deactivate REPO
 
   C --> V : true
