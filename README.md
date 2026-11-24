@@ -23,7 +23,7 @@ Simulador-Bancario-POO/
 ├── pom.xml                  # Configuración Maven multiproyecto
 ├── amortizacion-lib/        # Librería independiente de cálculo financiero (.jar)
 ├── banco-app/               # Aplicación principal (MVC + Persistencia)
-├── datos/                   # Archivos .csv con datos iniciales (3 clientes y 1 gerente)
+├── datos-prueba/            # Archivos .csv con datos iniciales (3 clientes y 1 gerente)
 └── docs/                    # Diagramas UML (Clases, Paquetes y Secuencia)
 ```
 
@@ -36,6 +36,7 @@ Simulador-Bancario-POO/
 ---
 
 ## Compilar y Ejecutar
+> **Paso previo (Datos iniciales):** Antes de ejecutar la aplicación, copia la carpeta `datos-prueba/` dentro de `banco-app/` y renómbrala a `datos/` (si se omite este paso, el programa arrancará sin usuarios precargados).
 
 ### Desde NetBeans
 Los dos módulos son independientes (cada uno tiene su propio `pom.xml`).
@@ -61,7 +62,7 @@ mvn -pl banco-app exec:java -Dexec.mainClass="com.banco.app.Main"
 ---
 
 ## Credenciales de Prueba
-Al iniciar la aplicación se cargan automáticamente los archivos `.csv` con los siguientes usuarios precargados:
+Una vez copiada la carpeta `datos-prueba/` como `datos/`, al iniciar la aplicación se cargarán automáticamente los siguientes usuarios precargados:
 
 | Rol | Usuario | Contraseña |
 | :--- | :--- | :--- |
