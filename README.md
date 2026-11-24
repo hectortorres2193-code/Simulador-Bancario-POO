@@ -8,9 +8,9 @@ Este repositorio tiene toda la lógica y los datos a partir de la union del trab
 agrega aparte y solo necesita llamar a los controladores.
 
 # Integrantes
-- _Juan Pablo_ (lógica de negocio y librería)
-- _Hector Leonardo_ (capa de datos)
-- _Samara_ (interfaz)
+- _Juan Pablo Diaz Peñaloza_ (lógica de negocio y librería)
+- _Hector Leonardo Torres Campos_ (capa de datos)
+- _Samara Mardueño Bernardino_ (interfaz)
 
 # Estado
 | Parte | Estado |
