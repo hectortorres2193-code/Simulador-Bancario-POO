@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.banco</groupId>
+    <artifactId>banco-app</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>Aplicación bancaria (MVC + Swing)</name>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Clase que ejecuta "Run" en NetBeans. Cuando exista la interfaz, cambiar a com.banco.app.Main -->
+        <exec.mainClass>com.banco.app.MainPrueba</exec.mainClass>
+    </properties>
+
+    <dependencies>
+        <!-- Nuestra librería propia, consumida como dependencia (.jar).
+             Debe estar instalada: "Clean and Build" en amortizacion-lib (o en el proyecto raíz). -->
+        <dependency>
+            <groupId>com.banco</groupId>
+            <artifactId>amortizacion-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

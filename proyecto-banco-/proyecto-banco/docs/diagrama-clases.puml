@@ -1,0 +1,361 @@
+@startuml diagrama-clases
+title Diagrama de clases UML - Simulador de Sistema Bancario y Créditos
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam dpi 110
+skinparam nodesep 25
+skinparam ranksep 45
+skinparam ArrowColor #444444
+skinparam classBorderColor #444444
+skinparam classBackgroundColor #FFFFFF
+skinparam packageBorderColor #777777
+skinparam packageFontStyle bold
+skinparam roundCorner 8
+skinparam linetype polyline
+
+' ============================================================
+' LIBRERÍA PROPIA (proyecto independiente -> amortizacion-lib.jar)
+' ============================================================
+package "amortizacion-lib.jar  (com.banco.amortizacion)\nLIBRERÍA INDEPENDIENTE: sin Swing, sin Cliente" as PkgLib #E3F2E1 {
+  class CalculadoraAmortizacion {
+    +calcularCuotaMensual(monto : BigDecimal, tasaAnual : BigDecimal, meses : int) : BigDecimal
+    +generarTabla(monto : BigDecimal, tasaAnual : BigDecimal, meses : int) : List<CuotaAmortizacion>
+    +calcularTotalIntereses(tabla : List<CuotaAmortizacion>) : BigDecimal
+    -validar(monto : BigDecimal, tasaAnual : BigDecimal, meses : int) : void
+  }
+  class CuotaAmortizacion {
+    -numero : int
+    -cuota : BigDecimal
+    -interes : BigDecimal
+    -capital : BigDecimal
+    -saldoRestante : BigDecimal
+    +CuotaAmortizacion(numero : int, cuota : BigDecimal, interes : BigDecimal, capital : BigDecimal, saldoRestante : BigDecimal)
+    +getNumero() : int
+    +getCuota() : BigDecimal
+    +getInteres() : BigDecimal
+    +getCapital() : BigDecimal
+    +getSaldoRestante() : BigDecimal
+  }
+}
+
+' ============================================================
+' APLICACIÓN (banco-app)
+' ============================================================
+package "banco-app  (com.banco.app)\nAPLICACIÓN" as PkgApp #FAFAFA {
+
+  class Main {
+    +{static} main(args : String[]) : void
+  }
+
+  ' ---------------- MODELO ----------------
+  package "model  (Modelo)" as PkgModel #FFF3D6 {
+    enum Rol {
+      CLIENTE
+      GERENTE
+    }
+    enum TipoTransaccion {
+      DEPOSITO
+      RETIRO
+      DESEMBOLSO_PRESTAMO
+      PAGO_CUOTA
+    }
+    enum EstadoPrestamo {
+      ACTIVO
+      PAGADO
+    }
+    abstract class Usuario {
+      -id : String
+      -nombre : String
+      -username : String
+      -password : String
+      +Usuario(id : String, nombre : String, username : String, password : String)
+      +autenticar(username : String, password : String) : boolean
+      +{abstract} getRol() : Rol
+      +getId() : String
+      +getNombre() : String
+      +getUsername() : String
+      +getPassword() : String
+    }
+    class Cliente {
+      +Cliente(id : String, nombre : String, username : String, password : String)
+      +getRol() : Rol
+    }
+    class Gerente {
+      +Gerente(id : String, nombre : String, username : String, password : String)
+      +getRol() : Rol
+    }
+    class Cuenta {
+      -idCuenta : String
+      -idCliente : String
+      -saldo : BigDecimal
+      -transacciones : List<Transaccion>
+      +Cuenta(idCuenta : String, idCliente : String, saldo : BigDecimal)
+      +depositar(monto : BigDecimal) : void
+      +retirar(monto : BigDecimal) : void
+      +acreditarPrestamo(monto : BigDecimal) : void
+      +pagarCuota(monto : BigDecimal) : void
+      +acreditarPrestamo(monto : BigDecimal, descripcion : String) : void
+      +pagarCuota(monto : BigDecimal, descripcion : String) : void
+      +agregarTransaccion(t : Transaccion) : void
+      +getUltimasTransacciones(n : int) : List<Transaccion>
+      +getSaldo() : BigDecimal
+      +getIdCuenta() : String
+      +getIdCliente() : String
+      +getTransacciones() : List<Transaccion>
+    }
+    class Transaccion {
+      -idTransaccion : String
+      -idCuenta : String
+      -tipo : TipoTransaccion
+      -monto : BigDecimal
+      -fecha : LocalDateTime
+      -descripcion : String
+      +Transaccion(id : String, idCuenta : String, tipo : TipoTransaccion, monto : BigDecimal, fecha : LocalDateTime, descripcion : String)
+      +getIdTransaccion() : String
+      +getIdCuenta() : String
+      +getTipo() : TipoTransaccion
+      +getMonto() : BigDecimal
+      +getFecha() : LocalDateTime
+      +getDescripcion() : String
+    }
+    class Prestamo {
+      -idPrestamo : String
+      -idCliente : String
+      -idCuenta : String
+      -montoOriginal : BigDecimal
+      -tasaAnual : BigDecimal
+      -plazoMeses : int
+      -cuotasPagadas : int
+      -estado : EstadoPrestamo
+      -fechaInicio : LocalDate
+      +Prestamo(idPrestamo : String, idCliente : String, idCuenta : String, monto : BigDecimal, tasaAnual : BigDecimal, plazoMeses : int)
+      +Prestamo(..., cuotasPagadas : int, estado : EstadoPrestamo, fechaInicio : LocalDate)
+      +registrarPago() : void
+      +getCuotasPendientes() : int
+      +isActivo() : boolean
+      +getIdPrestamo() : String
+      +getIdCliente() : String
+      +getMontoOriginal() : BigDecimal
+      +getTasaAnual() : BigDecimal
+      +getPlazoMeses() : int
+      +getCuotasPagadas() : int
+      +getIdCuenta() : String
+      +getEstado() : EstadoPrestamo
+      +getFechaInicio() : LocalDate
+    }
+    class SaldoInsuficienteException {
+      +SaldoInsuficienteException(mensaje : String)
+    }
+  }
+
+  ' ---------------- DATOS ----------------
+  package "data  (Capa de datos)" as PkgData #E3EEFB {
+    class BancoContext <<Singleton>> {
+      -{static} instancia : BancoContext
+      -usuarios : List<Usuario>
+      -cuentas : List<Cuenta>
+      -prestamos : List<Prestamo>
+      -usuarioActual : Usuario
+      -BancoContext()
+      +{static} getInstance() : BancoContext
+      +buscarUsuario(username : String) : Usuario
+      +getCuentaDe(idCliente : String) : Cuenta
+      +getClientes() : List<Cliente>
+      +getPrestamosDe(idCliente : String) : List<Prestamo>
+      +getPrestamo(idPrestamo : String) : Prestamo
+      +agregarPrestamo(p : Prestamo) : void
+      +siguienteId(prefijo : String) : String
+      +getUsuarioActual() : Usuario
+      +setUsuarioActual(u : Usuario) : void
+      +getUsuarios() : List<Usuario>
+      +getCuentas() : List<Cuenta>
+      +getPrestamos() : List<Prestamo>
+      +limpiar() : void
+    }
+    interface RepositorioDatos {
+      +cargar() : void
+      +guardar() : boolean
+    }
+    class CsvRepositorio {
+      -carpetaDatos : String
+      -{static} SEPARADOR : String = ";"
+      +CsvRepositorio()
+      +CsvRepositorio(carpetaDatos : String)
+      +cargar() : void
+      +guardar() : boolean
+      -leerArchivo(nombre : String) : List<String>
+      -escribirArchivo(nombre : String, lineas : List<String>) : boolean
+      -avisoRenglon(archivo : String, renglon : int, motivo : String) : void
+    }
+  }
+
+  ' ---------------- CONTROLADOR ----------------
+  package "controller  (Controlador)" as PkgCtrl #F1E4F7 {
+    class LoginController {
+      +iniciarSesion(username : String, password : String) : boolean
+      +getRolActual() : Rol
+      +cerrarSesion() : void
+    }
+    class CuentaController {
+      +getNombreCliente() : String
+      +getSaldo() : BigDecimal
+      +getUltimasTransacciones(n : int) : List<Transaccion>
+      +depositar(monto : BigDecimal) : void
+      +retirar(monto : BigDecimal) : void
+    }
+    class PrestamoController {
+      -{static} TASA_ANUAL : BigDecimal = 0.12
+      -calculadora : CalculadoraAmortizacion
+      -repositorio : RepositorioDatos
+      +getTasaAnual() : BigDecimal
+      +simularPrestamo(monto : BigDecimal, meses : int) : List<CuotaAmortizacion>
+      +aceptarPrestamo(monto : BigDecimal, meses : int) : List<CuotaAmortizacion>
+      +getPrestamosActivos() : List<Prestamo>
+    }
+    class GerenteController {
+      -calculadora : CalculadoraAmortizacion
+      -repositorio : RepositorioDatos
+      +getClientes() : List<Cliente>
+      +getPrestamosDe(idCliente : String) : List<Prestamo>
+      +getTransaccionesDe(idCliente : String) : List<Transaccion>
+      +registrarPago(idPrestamo : String) : void
+    }
+    class PersistenciaController {
+      -repositorio : RepositorioDatos
+      +cargarAlIniciar() : void
+      +guardar() : boolean
+      +guardarAlCerrar() : boolean
+    }
+  }
+
+  ' ---------------- VISTA ----------------
+  package "view  (Vista - Swing)" as PkgView #FDE3E3 {
+    class VentanaPrincipal {
+      -layout : CardLayout
+      -contenedor : JPanel
+      -persistenciaController : PersistenciaController
+      +VentanaPrincipal(persistenciaController : PersistenciaController)
+      +mostrarPantalla(nombre : String) : void
+      -configurarCierre() : void
+    }
+    class LoginView {
+      -txtUsuario : JTextField
+      -txtPassword : JPasswordField
+      -btnIngresar : JButton
+      -loginController : LoginController
+      +LoginView(loginController : LoginController)
+      +mostrarError(mensaje : String) : void
+    }
+    class DashboardView {
+      -lblNombre : JLabel
+      -lblSaldo : JLabel
+      -tablaTransacciones : JTable
+      -btnCaja : JButton
+      -btnPrestamo : JButton
+      -btnGuardar : JButton
+      -cuentaController : CuentaController
+      -persistenciaController : PersistenciaController
+      +refrescar() : void
+    }
+    class CajaView {
+      -txtMonto : JTextField
+      -btnDepositar : JButton
+      -btnRetirar : JButton
+      -cuentaController : CuentaController
+      +limpiarCampos() : void
+    }
+    class PrestamoView {
+      -txtMonto : JTextField
+      -spnPlazo : JSpinner
+      -tablaAmortizacion : JTable
+      -btnSimular : JButton
+      -btnAceptarPrestamo : JButton
+      -prestamoController : PrestamoController
+      +mostrarTabla(cuotas : List<CuotaAmortizacion>) : void
+    }
+    class GerenteView {
+      -tablaClientes : JTable
+      -tablaPrestamos : JTable
+      -btnRegistrarPago : JButton
+      -gerenteController : GerenteController
+      +refrescar() : void
+    }
+  }
+}
+
+' ---------------- Clases externas (JDK) ----------------
+package "javax.swing  (JDK)" as PkgSwing #EEEEEE {
+  class JFrame
+  class JPanel
+}
+class Exception <<java.lang>>
+
+' ============================================================
+' RELACIONES
+' ============================================================
+
+' --- Librería ---
+CalculadoraAmortizacion ..> CuotaAmortizacion : <<crea>>
+
+' --- Modelo ---
+Usuario <|-- Cliente
+Usuario <|-- Gerente
+Usuario ..> Rol
+Cuenta *-- "0..*" Transaccion
+Transaccion ..> TipoTransaccion
+Prestamo ..> EstadoPrestamo
+Cliente "1" -- "1" Cuenta : posee >
+Cliente "1" -- "0..*" Prestamo : solicita >
+Cuenta ..> SaldoInsuficienteException : <<lanza>>
+Exception <|-- SaldoInsuficienteException
+
+' --- Datos ---
+BancoContext o-- "0..*" Usuario
+BancoContext o-- "0..*" Cuenta
+BancoContext o-- "0..*" Prestamo
+CsvRepositorio ..|> RepositorioDatos
+CsvRepositorio ..> BancoContext
+
+' --- Controladores ---
+LoginController ..> BancoContext
+CuentaController ..> BancoContext
+PrestamoController ..> BancoContext
+GerenteController ..> BancoContext
+PrestamoController ..> Prestamo : <<crea>>
+PrestamoController --> CalculadoraAmortizacion
+GerenteController --> CalculadoraAmortizacion
+PrestamoController --> RepositorioDatos
+GerenteController --> RepositorioDatos
+PersistenciaController --> RepositorioDatos
+
+' --- Vistas ---
+VentanaPrincipal *-- LoginView
+VentanaPrincipal *-- DashboardView
+VentanaPrincipal *-- CajaView
+VentanaPrincipal *-- PrestamoView
+VentanaPrincipal *-- GerenteView
+VentanaPrincipal --> PersistenciaController
+LoginView --> LoginController
+DashboardView --> CuentaController
+DashboardView --> PersistenciaController
+CajaView --> CuentaController
+PrestamoView --> PrestamoController
+GerenteView --> GerenteController
+JFrame <|-- VentanaPrincipal
+JPanel <|-- LoginView
+JPanel <|-- DashboardView
+JPanel <|-- CajaView
+JPanel <|-- PrestamoView
+JPanel <|-- GerenteView
+
+' --- Lectura de datos por la vista (solo mostrar) ---
+PrestamoView ..> CuotaAmortizacion : <<muestra>>
+DashboardView ..> Transaccion : <<muestra>>
+GerenteView ..> Prestamo : <<muestra>>
+
+' --- Main ---
+Main ..> VentanaPrincipal : <<crea>>
+Main ..> CsvRepositorio : <<crea>>
+
+@enduml

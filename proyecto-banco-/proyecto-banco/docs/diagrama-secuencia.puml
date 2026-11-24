@@ -1,0 +1,78 @@
+@startuml diagrama-secuencia
+title Diagrama de secuencia - "Aceptar Préstamo"
+
+skinparam shadowing false
+skinparam dpi 130
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+skinparam ParticipantPadding 15
+skinparam BoxPadding 10
+skinparam sequenceArrowThickness 1.2
+skinparam noteBackgroundColor #FFFBE6
+skinparam noteBorderColor #BBA84A
+autonumber "<b>0"
+
+actor "Cliente" as U
+
+box "VISTA" #FDE3E3
+  participant "PrestamoView" as V
+end box
+box "CONTROLADOR" #F1E4F7
+  participant "PrestamoController" as C
+end box
+box "LIBRERÍA (amortizacion-lib.jar)" #E3F2E1
+  participant "CalculadoraAmortizacion" as L
+end box
+box "MODELO" #FFF3D6
+  participant "Cuenta" as CU
+  participant "Prestamo" as P
+end box
+box "CAPA DE DATOS" #E3EEFB
+  participant "BancoContext\n<<Singleton>>" as B
+  participant "CsvRepositorio" as R
+  database "archivos .csv" as F
+end box
+
+U -> V : ingresa monto y plazo (meses)\ny presiona "Aceptar Préstamo"
+activate V
+V -> C : aceptarPrestamo(monto, meses)
+activate C
+
+alt monto <= 0 o meses <= 0
+  C --> V : IllegalArgumentException
+  V --> U : muestra mensaje de error
+else datos válidos
+  C -> B : getInstance()
+  B --> C : instancia única
+  C -> B : getUsuarioActual()
+  B --> C : cliente
+  C -> B : getCuentaDe(idCliente)
+  B --> C : cuenta
+
+  C -> L : generarTabla(monto, TASA_ANUAL, meses)
+  activate L
+  L --> C : List<CuotaAmortizacion>
+  deactivate L
+
+  C -> P ** : new Prestamo(id, idCliente, idCuenta,\nmonto, TASA_ANUAL, meses)
+  C -> CU : acreditarPrestamo(monto)
+  activate CU
+  note right of CU : suma el monto al saldo\ny registra Transaccion\nDESEMBOLSO_PRESTAMO
+  CU --> C : saldo actualizado
+  deactivate CU
+
+  C -> B : agregarPrestamo(prestamo)
+  C -> R : guardar()
+  activate R
+  R -> F : escribe usuarios.csv, cuentas.csv,\ntransacciones.csv y prestamos.csv
+  F --> R : ok
+  R --> C : true (guardado)
+  deactivate R
+
+  C --> V : List<CuotaAmortizacion> + nuevo saldo
+  V --> U : muestra confirmación, tabla de\namortización y saldo actualizado
+end
+
+deactivate C
+deactivate V
+@enduml

@@ -1,0 +1,61 @@
+@startuml diagrama-paquetes
+title Diagrama de paquetes - MVC + Capa de datos + Librería externa
+
+left to right direction
+skinparam shadowing false
+skinparam dpi 130
+skinparam nodesep 70
+skinparam ranksep 70
+skinparam ArrowColor #444444
+skinparam ArrowFontSize 12
+skinparam roundCorner 8
+skinparam defaultTextAlignment center
+skinparam rectangleBorderColor #666666
+skinparam noteBackgroundColor #FFFBE6
+skinparam noteBorderColor #BBA84A
+
+rectangle "banco-app.jar   (APLICACIÓN)" as App #FAFAFA {
+
+  rectangle "**com.banco.app**  (raíz)\n\nMain" as Raiz #EFEFEF
+
+  rectangle "**com.banco.app.view**\nVISTA (Swing)\n\nVentanaPrincipal · LoginView\nDashboardView · CajaView\nPrestamoView · GerenteView" as View #FDE3E3
+
+  rectangle "**com.banco.app.controller**\nCONTROLADOR\n\nLoginController · CuentaController\nPrestamoController · GerenteController\nPersistenciaController" as Ctrl #F1E4F7
+
+  rectangle "**com.banco.app.model**\nMODELO (lógica de negocio)\n\nUsuario · Cliente · Gerente · Cuenta\nTransaccion · Prestamo · Rol\nTipoTransaccion · EstadoPrestamo\nSaldoInsuficienteException" as Model #FFF3D6
+
+  rectangle "**com.banco.app.data**\nCAPA DE DATOS\n\nBancoContext «Singleton»\nRepositorioDatos «interface»\nCsvRepositorio" as Data #E3EEFB
+}
+
+rectangle "**amortizacion-lib.jar**   LIBRERÍA PROPIA\ncom.banco.amortizacion\n\nCalculadoraAmortizacion\nCuotaAmortizacion" as Lib #E3F2E1
+
+rectangle "**javax.swing**  (JDK)\n\nJFrame · JPanel" as Swing #EEEEEE
+
+rectangle "**Archivos .csv**\n\nusuarios.csv · cuentas.csv\ntransacciones.csv · prestamos.csv" as Csv #FFFFFF
+
+' ---------- Dependencias entre paquetes ----------
+Raiz --> View : <<crea>>
+View --> Ctrl : notifica eventos
+View --> Swing : <<extends>>
+Ctrl --> Model : manipula
+Ctrl --> Data : usa
+Data --> Model : lee / escribe
+Ctrl --> Lib : <<import .jar>>
+View ..> Lib : <<solo lectura>>
+View ..> Model : <<solo lectura>>
+Data --> Csv : lee / escribe
+
+note right of Lib
+  **La librería no depende de nada:**
+  no importa Swing/AWT/JavaFX
+  ni conoce a Cliente ni al modelo.
+end note
+
+note bottom of Raiz
+  Main crea el repositorio, los
+  controladores y la ventana
+  (inyección de dependencias).
+end note
+
+
+@enduml

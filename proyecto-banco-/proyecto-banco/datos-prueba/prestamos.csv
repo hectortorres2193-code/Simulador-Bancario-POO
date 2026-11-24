@@ -1,0 +1,2 @@
+idPrestamo;idCliente;idCuenta;montoOriginal;tasaAnual;plazoMeses;cuotasPagadas;estado;fechaInicio
+P001;U002;C002;5000.00;0.12;12;3;ACTIVO;2026-08-15
