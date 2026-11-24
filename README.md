@@ -16,7 +16,7 @@ Proyecto final de la materia \*\*Programación Orientada a Objetos (POO)\*\*. Ap
 
 \* \*\*\[Nombre Compañero 2]\*\* — Librería Matemática de Amortización y Paquete `modelo`.
 
-\* \*\*\[Nombre Compañero 3]\*\* — Interfaz Gráfica (`vista` en Java Swing) y Paquete `controlador`.
+\* \*\*\Samara Mardueño Bernardino\*\* — Interfaz Gráfica (`vista` en Java Swing) y Paquete `controlador`.
 
 
 
