@@ -1,0 +1,5 @@
+id;rol;username;password;nombre
+U001;CLIENTE;ana;1234;Ana Torres
+U002;CLIENTE;luis;1234;Luis Gómez
+U003;CLIENTE;maria;1234;María Pérez
+U004;GERENTE;gerente;admin;Carlos Ruiz
