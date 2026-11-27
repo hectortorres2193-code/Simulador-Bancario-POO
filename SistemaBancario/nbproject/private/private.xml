@@ -2,16 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/src/Inicio.java</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/src/Login.java</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/src/SecionIniciada.java</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/src/Deposito.java</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/src/Prestamos.java</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/src/Admin.java</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/datos/prestamos.csv</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/datos/usuarios.csv</file>
-            <file>file:/C:/Users/samar/OneDrive/Documentos/NetBeansProjects/SistemaBancario/datos/cuentas.csv</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
